@@ -2,7 +2,7 @@ console.log('Task Manager App');
 const express = require('express');
 const taskRoutes = require('./routes/tasks')
 const connectDB = require('./db/connect')
-
+require('dotenv').config()
 
 const app = express();
 //middleware
@@ -24,7 +24,7 @@ app.use('/api/v1/tasks',taskRoutes)
 const port = 3300;
 const startServer = async() => {
   try {
-    await connectDB()
+    await connectDB(process.env.MONGO_URI)
     app.listen(port, console.log(`port running on ${port}`))
   } catch (error) {
     console.log(error);
