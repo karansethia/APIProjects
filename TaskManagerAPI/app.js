@@ -2,9 +2,14 @@ console.log('Task Manager App');
 const express = require('express');
 const taskRoutes = require('./routes/tasks')
 const connectDB = require('./db/connect')
+const cors = require('cors')
 require('dotenv').config()
 
 const app = express();
+
+app.use(cors({
+  origin: '*'
+}))
 //middleware
 app.use(express.json())
 
