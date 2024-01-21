@@ -25,6 +25,11 @@ const notesSchema = new mongoose.Schema({
   },
   addedData: {
     type: Date
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 
 });
