@@ -1,6 +1,6 @@
 const asyncWrapper = require('../middleware/async-wrapper');
 const Note = require('../models/note');
-import User from '../models/user';
+const User = require('../models/user');
 const sendNotesController = asyncWrapper(async(req,res) => {
   //get all the notes from mongodb
   const user = await User.findById(req.body.userId);
