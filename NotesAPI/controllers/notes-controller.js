@@ -12,10 +12,14 @@ const sendNotesController = asyncWrapper(async(req,res) => {
   //send all the user's notes in response 
   res.status(201).json({notes: allNotes})
 })
+
+
 const postNotesController = asyncWrapper(async(req,res) => {
   //get id => if id exists then update else save new note
   const noteId = req.body.noteId; //todo find the id through user collection in mongodb
+  console.log(noteId);
   const user = await User.findById(req.body.userId);
+  console.log(user);
   if(!user){
     return res.status(403).json({message: "User not found"})
   }
@@ -25,9 +29,11 @@ const postNotesController = asyncWrapper(async(req,res) => {
     });
     return res.status(201).json(updatedNote)
   }else{
-    const newNote = await Note.create({...req.body.noteDetail,userId: user._id},{new: true});
+    const noteDetail = req.body.noteDetail;
+    const newNote = {"title": noteDetail.title, "content":noteDetail.content,"isPin": noteDetail.isPin,"includedTags":noteDetail.includedTags, "userId": user._id}
+    const note = await Note.create(newNote);
     // add the new note id to the noteId of User collection
-    return res.status(201).json(newNote)
+    return res.status(201).json(note)
   }
 } );
 
