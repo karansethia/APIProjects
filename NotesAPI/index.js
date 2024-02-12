@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 app.use('/api/v1',authRoutes)
 app.use('/api/v1',refreshRoutes);
-// app.use(verifyJwt)  
+app.use(verifyJwt)  
 app.use('/api/v1', noteRoutes);
 const PORT = process.env.PORT || 3100
 

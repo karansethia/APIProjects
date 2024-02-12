@@ -1,6 +1,7 @@
 const asyncWrapper = require('../middleware/async-wrapper');
 const Note = require('../models/note');
 const User = require('../models/user');
+
 const sendNotesController = asyncWrapper(async(req,res) => {
   //get all the notes from mongodb
   const user = await User.findById(req.body.userId);
@@ -32,19 +33,28 @@ const postNotesController = asyncWrapper(async(req,res) => {
     const noteDetail = req.body.noteDetail;
     const newNote = {"title": noteDetail.title, "content":noteDetail.content,"isPin": noteDetail.isPin,"includedTags":noteDetail.includedTags, "userId": user._id}
     const note = await Note.create(newNote);
+    await User.findByIdAndUpdate(user._id,{$push:{noteId: {$each: [note._id]}}})
     // add the new note id to the noteId of User collection
     return res.status(201).json(note)
   }
 } );
 
 const deleteNotesController = asyncWrapper(async(req,res)=> {
-  try {
-    await Note.findByIdAndDelete(req.body.noteid);
-    return res.json({message: "Deleted"})
-    
-  } catch (error) {
-    return res.json({message: error.message})
-    
+  
+  // find if the user has access to that particulat note
+  const doesUserHaveAccess = await Note.find({userId: req.body.userId});
+  if(!doesUserHaveAccess){
+    return res.status(401).json({"message": "Note doesnt exist, Login again to retry"})
+  }
+  if(doesUserHaveAccess){
+    try {
+      await Note.findByIdAndDelete(req.body.noteId);
+      return res.json({message: "Deleted"})
+      
+    } catch (error) {
+      return res.json({message: error.message})
+      
+    }
   }
 })
 

@@ -35,7 +35,7 @@ const registerController = asyncWrapper(async(req,res)=> {
 })
 const loginController = asyncWrapper(async(req,res)=> {
   const { email, password } = req.body;
-  console.log(req.body);
+  
   if(!email || !password){
     return res.status(400).json({"message": "Email or Password not found"});
   }
@@ -68,4 +68,22 @@ const loginController = asyncWrapper(async(req,res)=> {
   }
 });
 
-module.exports = {registerController, loginController}
+const logoutController = asyncWrapper(async(req,res) => {
+  const cookies = req.cookies;
+  if(!cookies?.jwt){
+    return res.status(204);
+  }
+  const refreshToken = cookies.jwt;
+  const foundUser = await User.findOne({refreshToken});
+   if(!foundUser){
+    res.clearCookie('jwt', {httpOnly: true})
+    return res.status(204);
+  }
+  await User.findByIdAndUpdate({_id: foundUser._id},{refreshToken: ''});
+  res.clearCookie('jwt',{httpOnly: true});   
+  return res.sendStatus(204);
+
+
+})
+
+module.exports = {registerController, loginController, logoutController}
